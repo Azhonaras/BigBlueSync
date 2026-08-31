@@ -1,4 +1,4 @@
-name: Build and Release BigBlueSync
+name: Build and Release Multi-Platform Binaries
 
 on:
   push:
@@ -10,8 +10,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: BigBlueSync-Windows.exe
+            binary_path: dist/BigBlueSync-Windows.exe
+            build_cmd: python -m PyInstaller --noconfirm --onefile --windowed --name BigBlueSync-Windows --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
+          - os: ubuntu-latest
+            artifact_name: BigBlueSync-Linux-x86_64
+            binary_path: dist/BigBlueSync-Linux-x86_64
+            build_cmd: python -m PyInstaller --noconfirm --onefile --windowed --name BigBlueSync-Linux-x86_64 --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
+          - os: macos-latest
+            artifact_name: BigBlueSync-macOS
+            binary_path: dist/BigBlueSync-macOS
+            build_cmd: python -m PyInstaller --noconfirm --onefile --windowed --name BigBlueSync-macOS --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
 
     steps:
     - name: Check out repository
@@ -22,29 +39,34 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install dependencies
+    - name: Install Linux system dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-tk python3-dev
+
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run test suite
+    - name: Run automated test suite
       run: |
         python test_suite.py
 
-    - name: Build executable with PyInstaller
-      run: |
-        pyinstaller --clean BigBlueSync.spec
+    - name: Build standalone executable
+      run: ${{ matrix.build_cmd }}
 
-    - name: Upload executable artifact
+    - name: Upload build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: BigBlueSync-Windows-x64
-        path: dist/BigBlueSync.exe
+        name: ${{ matrix.artifact_name }}
+        path: ${{ matrix.binary_path }}
 
-    - name: Create Release (on Tag)
+    - name: Publish Release Assets
       if: startsWith(github.ref, 'refs/tags/v')
       uses: softprops/action-gh-release@v2
       with:
-        files: dist/BigBlueSync.exe
+        files: ${{ matrix.binary_path }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

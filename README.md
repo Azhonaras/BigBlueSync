@@ -51,15 +51,27 @@ python BigBlueSync.py
 
 ---
 
-## Building a standalone executable
+## Building standalone executables
 
-To compile BigBlueSync into a single Windows executable:
-
+### Windows
 ```bash
-pyinstaller --clean BigBlueSync.spec
+python -m PyInstaller --noconfirm --onefile --windowed --name "BigBlueSync-Windows" --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
 ```
 
-The output binary is placed in the `dist/` directory as `BigBlueSync.exe`.
+### Linux (Ubuntu / Debian / Fedora)
+```bash
+# Install Tkinter system package if needed
+sudo apt-get install python3-tk
+
+python -m PyInstaller --noconfirm --onefile --windowed --name "BigBlueSync-Linux-x86_64" --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
+```
+
+### macOS (Apple Silicon / Intel)
+```bash
+python -m PyInstaller --noconfirm --onefile --windowed --name "BigBlueSync-macOS" --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
+```
+
+Compiled binaries are generated in the `dist/` folder. Binaries for all three operating systems are also built automatically on GitHub via GitHub Actions workflows.
 
 ---
 
