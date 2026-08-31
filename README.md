@@ -10,68 +10,32 @@ BigBlueButton recording downloader and stream multiplexer.
 
 ## Overview
 
-BigBlueSync is a desktop utility for downloading and combining recorded BigBlueButton sessions into single video files.
+BigBlueSync is a desktop application for downloading and combining recorded BigBlueButton sessions into single video files.
 
-BigBlueButton stores recordings in separate media streams, typically keeping screen shares in `deskshare.mp4` and microphone audio with camera video in `webcams.mp4`. BigBlueSync downloads both files and runs a stream copy through FFmpeg to mux the screen recording with the presenter audio into an `.mp4` file without re-encoding.
+BigBlueButton stores recordings in separate media streams, typically keeping screen shares in `deskshare.mp4` and microphone audio with camera video in `webcams.mp4`. BigBlueSync automatically downloads both files and runs a stream copy through FFmpeg to merge the screen recording with presenter audio into an `.mp4` file in seconds without quality loss.
+
+---
+
+## Download and run
+
+Precompiled standalone binaries are available on the [Releases](https://github.com/yourusername/BigBlueSync/releases) page. No Python or dependencies required.
+
+| Platform | File to download | How to run |
+| :--- | :--- | :--- |
+| **Windows** | `BigBlueSync-Windows.exe` | Double-click to run |
+| **macOS** | `BigBlueSync-macOS` | Double-click or run from terminal |
+| **Linux** | `BigBlueSync-Linux-x86_64` | `chmod +x BigBlueSync-Linux-x86_64 && ./BigBlueSync-Linux-x86_64` |
 
 ---
 
 ## Features
 
-- **Lossless stream remuxing**: Combines video and audio streams using FFmpeg stream copy (`-c:v copy -c:a copy`), completing in a few seconds without quality loss.
-- **URL resolver**: Extracts meeting IDs from standard playback paths (`/playback/presentation/2.3/<id>`) and query parameters (`?meetingId=<id>`).
-- **Dark mode interface**: Built on CustomTkinter with responsive status feedback and progress tracking.
+- **Lossless stream remuxing**: Combines video and audio streams using FFmpeg stream copy (`-c:v copy -c:a copy`), completing in seconds without quality loss.
+- **URL resolver**: Automatically extracts meeting IDs from standard playback paths (`/playback/presentation/2.3/<id>`) and query parameters (`?meetingId=<id>`).
+- **Dark mode interface**: Clean desktop interface with real-time status and progress tracking.
 - **SSL tolerance**: Connects to institutional servers that use internal or self-signed SSL certificates.
-- **Download progress**: Displays real-time chunk progress in megabytes and percentage.
-- **Bundled FFmpeg support**: Uses `imageio-ffmpeg` to manage FFmpeg binaries without requiring manual PATH configuration.
-
----
-
-## Quick start
-
-### Prerequisites
-- Python 3.10 or higher
-- `pip` package manager
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/yourusername/BigBlueSync.git
-cd BigBlueSync
-```
-
-### 2. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Run the application
-```bash
-python BigBlueSync.py
-```
-
----
-
-## Building standalone executables
-
-### Windows
-```bash
-python -m PyInstaller --noconfirm --onefile --windowed --name "BigBlueSync-Windows" --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
-```
-
-### Linux (Ubuntu / Debian / Fedora)
-```bash
-# Install Tkinter system package if needed
-sudo apt-get install python3-tk
-
-python -m PyInstaller --noconfirm --onefile --windowed --name "BigBlueSync-Linux-x86_64" --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
-```
-
-### macOS (Apple Silicon / Intel)
-```bash
-python -m PyInstaller --noconfirm --onefile --windowed --name "BigBlueSync-macOS" --collect-all customtkinter --collect-all imageio_ffmpeg BigBlueSync.py
-```
-
-Compiled binaries are generated in the `dist/` folder. Binaries for all three operating systems are also built automatically on GitHub via GitHub Actions workflows.
+- **Real-time progress**: Displays download progress in megabytes and percentage.
+- **Bundled FFmpeg**: Includes required media processing tools with no configuration needed.
 
 ---
 
@@ -100,17 +64,16 @@ Compiled binaries are generated in the `dist/` folder. Binaries for all three op
 
 ---
 
-## Testing and verification
+## Running from source (optional)
 
-BigBlueSync includes automated unit and integration tests along with an interactive manual QA checklist:
+If you prefer to run from source code:
 
-### Run automated tests
 ```bash
-python test_suite.py
+git clone https://github.com/yourusername/BigBlueSync.git
+cd BigBlueSync
+pip install -r requirements.txt
+python BigBlueSync.py
 ```
-
-### Open manual QA test book
-Open `scenarios.html` in any modern web browser to track test cases with persistent browser storage.
 
 ---
 
