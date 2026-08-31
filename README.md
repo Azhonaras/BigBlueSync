@@ -5,7 +5,7 @@ BigBlueButton recording downloader and stream multiplexer.
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![UI: CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-0284C7.svg)](https://github.com/TomSchimansky/CustomTkinter)
-[![Build Status](https://github.com/Azhonaras/BigBlueSync/actions/workflows/build.yml/badge.svg)](https://github.com/Azhonaras/BigBlueSync/actions/workflows/build.yml)
+[![Build Status](https://github.com/Azhonaras/BigBlueSync/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Azhonaras/BigBlueSync/actions/workflows/build.yml)
 
 ---
 
