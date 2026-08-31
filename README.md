@@ -23,9 +23,9 @@ Precompiled standalone binaries are available on the [Releases](https://github.c
 
 | Platform | File to download | How to run |
 | :--- | :--- | :--- |
-| **Windows** | `BigBlueSync-Windows.exe` | Double-click to run |
-| **macOS** | `BigBlueSync-macOS` | Double-click or run from terminal |
-| **Linux** | `BigBlueSync-Linux-x86_64` | `chmod +x BigBlueSync-Linux-x86_64 && ./BigBlueSync-Linux-x86_64` |
+| **Windows** | [`BigBlueSync-Windows.exe`](https://github.com/Azhonaras/BigBlueSync/releases/download/v1.0.0/BigBlueSync-Windows.exe) | Double-click to run |
+| **macOS** | [`BigBlueSync-macOS`](https://github.com/Azhonaras/BigBlueSync/releases/download/v1.0.0/BigBlueSync-macOS) | Double-click or run from terminal |
+| **Linux** | [`BigBlueSync-Linux-x86_64`](https://github.com/Azhonaras/BigBlueSync/releases/download/v1.0.0/BigBlueSync-Linux-x86_64) | `chmod +x BigBlueSync-Linux-x86_64 && ./BigBlueSync-Linux-x86_64` |
 
 ---
 
