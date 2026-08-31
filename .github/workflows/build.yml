@@ -46,7 +46,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-tk python3-dev
+        sudo apt-get install -y python3-tk python3-dev xvfb
 
     - name: Install Python dependencies
       run: |
@@ -55,7 +55,12 @@ jobs:
 
     - name: Run automated test suite
       run: |
-        python test_suite.py
+        if [ "$RUNNER_OS" = "Linux" ]; then
+          xvfb-run -a python test_suite.py
+        else
+          python test_suite.py
+        fi
+      shell: bash
 
     - name: Build standalone executable
       run: ${{ matrix.build_cmd }}
