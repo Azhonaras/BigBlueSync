@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BigBlueSync: QA Test Book and Scenario Matrix</title>
+  <style>
+    :root {
+      --bg-base: #0F172A;
+      --bg-card: #1E293B;
+      --bg-input: #0B1120;
+      --border-color: #334155;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --accent-blue: #0284C7;
+      --accent-hover: #0369A1;
+      --accent-light: #38BDF8;
+      --btn-sec: #334155;
+      --btn-sec-hov: #475569;
+      --status-pass: #10B981;
+      --status-pass-bg: rgba(16, 185, 129, 0.12);
+      --status-fail: #EF4444;
+      --status-fail-bg: rgba(239, 68, 68, 0.12);
+      --status-na: #64748B;
+      --status-na-bg: rgba(100, 116, 139, 0.12);
+      --note-info-bg: rgba(2, 132, 199, 0.15);
+      --note-info-border: #0284C7;
+      --note-warn-bg: rgba(245, 158, 11, 0.15);
+      --note-warn-border: #F59E0B;
+      --note-sec-bg: rgba(239, 68, 68, 0.15);
+      --note-sec-border: #EF4444;
+      --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --font-code: 'Cascadia Code', Consolas, 'Courier New', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Table of Contents */
+    .sidebar {
+      width: 280px;
+      background-color: var(--bg-card);
+      border-right: 1px solid var(--border-color);
+      padding: 24px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .toc-link {
+      display: block;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+    .toc-link:hover, .toc-link.active {
+      color: var(--text-main);
+      background-color: rgba(56, 189, 248, 0.1);
+      border-left: 3px solid var(--accent-light);
+    }
+
+    /* Main Content Area */
+    .content {
+      flex: 1;
+      padding: 32px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Sticky Header Bar */
+    .sticky-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 0;
+      margin-bottom: 32px;
+    }
+
+    .sticky-bar-content {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .stats-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+    }
+    .stat-badge.pass { border-color: var(--status-pass); color: var(--status-pass); }
+    .stat-badge.fail { border-color: var(--status-fail); color: var(--status-fail); }
+    .stat-badge.na { border-color: var(--status-na); color: var(--status-na); }
+    .stat-badge.remain { border-color: var(--accent-light); color: var(--accent-light); }
+
+    .global-progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: var(--bg-input);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 10px;
+      display: flex;
+    }
+    .progress-fill-pass { background-color: var(--status-pass); transition: width 0.3s; }
+    .progress-fill-fail { background-color: var(--status-fail); transition: width 0.3s; }
+    .progress-fill-na { background-color: var(--status-na); transition: width 0.3s; }
+
+    /* Controls & Filter Bar */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 240px;
+      height: 38px;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0 14px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--accent-light);
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+    }
+
+    .pill-btn {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.825rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pill-btn:hover { color: var(--text-main); border-color: var(--accent-light); }
+    .pill-btn.active {
+      background-color: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-light);
+    }
+
+    .action-btn {
+      background-color: var(--btn-sec);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.825rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .action-btn:hover { background-color: var(--btn-sec-hov); }
+    .action-btn.danger:hover { background-color: var(--status-fail); border-color: var(--status-fail); }
+
+    /* Section Cards */
+    .section-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 16px 20px;
+      background-color: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+
+    .section-progress {
+      width: 100px;
+      height: 6px;
+      background: var(--bg-input);
+      border-radius: 3px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .section-body {
+      padding: 20px;
+    }
+    .section-card.collapsed .section-body { display: none; }
+
+    .group-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 16px 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .group-title:first-child { margin-top: 0; }
+
+    /* Test Table */
+    .test-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 16px;
+    }
+
+    .test-table th {
+      background-color: var(--bg-input);
+      color: var(--text-muted);
+      font-size: 0.775rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .test-table td {
+      padding: 12px 14px;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    .test-row {
+      transition: background-color 0.2s;
+    }
+    .test-row:hover {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .test-row.status-pass {
+      background-color: var(--status-pass-bg) !important;
+    }
+    .test-row.status-fail {
+      background-color: var(--status-fail-bg) !important;
+    }
+    .test-row.status-na {
+      background-color: var(--status-na-bg) !important;
+      opacity: 0.65;
+    }
+
+    .test-id {
+      font-family: var(--font-code);
+      font-size: 0.8rem;
+      color: var(--accent-light);
+      white-space: nowrap;
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-weight: 600;
+    }
+
+    .action-col { width: 38%; }
+    .expect-col { width: 44%; }
+    .status-col { width: 18%; text-align: right; }
+
+    /* Status Buttons */
+    .status-btn-group {
+      display: inline-flex;
+      gap: 4px;
+    }
+
+    .status-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 5px 8px;
+      font-size: 0.775rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .status-btn:hover { color: var(--text-main); border-color: var(--text-muted); }
+
+    .status-btn.btn-pass.active { background: var(--status-pass); color: #fff; border-color: var(--status-pass); }
+    .status-btn.btn-fail.active { background: var(--status-fail); color: #fff; border-color: var(--status-fail); }
+    .status-btn.btn-na.active   { background: var(--status-na); color: #fff; border-color: var(--status-na); }
+
+    /* Notes */
+    .test-note {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .test-note.info {
+      background-color: var(--note-info-bg);
+      border-left: 3px solid var(--note-info-border);
+      color: #BAE6FD;
+    }
+    .test-note.warn {
+      background-color: var(--note-warn-bg);
+      border-left: 3px solid var(--note-warn-border);
+      color: #FDE68A;
+    }
+    .test-note.sec {
+      background-color: var(--note-sec-bg);
+      border-left: 3px solid var(--note-sec-border);
+      color: #FECACA;
+    }
+
+    code, kbd {
+      font-family: var(--font-code);
+      background-color: var(--bg-input);
+      color: var(--accent-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.825rem;
+      direction: ltr;
+      unicode-bidi: isolate;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Print & Responsive */
+    @media (max-width: 900px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; }
+      .content { padding: 20px; }
+      .test-table th, .test-table td { padding: 8px; }
+    }
+
+    @media print {
+      .sidebar, .sticky-bar, .controls-bar, .status-btn-group { display: none !important; }
+      body { background: #fff; color: #000; }
+      .section-card { border: 1px solid #ccc; break-inside: avoid; background: #fff; }
+      .section-body { display: block !important; }
+      code { color: #000; background: #eee; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Table of Contents -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span>BigBlueSync</span>
+    </div>
+    <div class="sidebar-subtitle">
+      Manual QA Test Book and Verification Suite
+    </div>
+    <nav id="tocNav"></nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    
+    <!-- Sticky Metric & Progress Bar -->
+    <header class="sticky-bar">
+      <div class="sticky-bar-content">
+        <div>
+          <h1 style="font-size: 1.4rem; font-weight: 700; color: var(--text-main);">BigBlueSync Verification Test Book</h1>
+          <p style="font-size: 0.825rem; color: var(--text-muted); margin-top: 2px;">Version 1.0.0 · Grounded strictly in <code>BigBlueSync.py</code> source code</p>
+        </div>
+        <div class="stats-container">
+          <div class="stat-badge pass">Pass: <span id="statPass">0</span></div>
+          <div class="stat-badge fail">Fail: <span id="statFail">0</span></div>
+          <div class="stat-badge na">N/A: <span id="statNA">0</span></div>
+          <div class="stat-badge remain">Remaining: <span id="statRemain">0</span></div>
+          <div class="stat-badge" style="color: var(--text-main);">Total: <span id="statTotal">0</span></div>
+        </div>
+      </div>
+      <div class="global-progress-bar">
+        <div id="progPass" class="progress-fill-pass" style="width: 0%;"></div>
+        <div id="progFail" class="progress-fill-fail" style="width: 0%;"></div>
+        <div id="progNA" class="progress-fill-na" style="width: 0%;"></div>
+      </div>
+    </header>
+
+    <!-- Controls Bar -->
+    <section class="controls-bar">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search test cases by ID, action, message, or keyword (e.g. ffmpeg, 404, url)...">
+      <div class="filter-pills">
+        <button class="pill-btn active" data-filter="all">All</button>
+        <button class="pill-btn" data-filter="remain">Not Done</button>
+        <button class="pill-btn" data-filter="pass">Passed</button>
+        <button class="pill-btn" data-filter="fail">Failed</button>
+      </div>
+      <button id="toggleExpandBtn" class="action-btn">Collapse All</button>
+      <button id="resetBtn" class="action-btn danger">Reset Progress</button>
+    </section>
+
+    <!-- Sections Container Rendered Dynamically -->
+    <div id="sectionsContainer"></div>
+
+  </main>
+
+  <script>
+    // --- QA TEST SCENARIO DATA MODEL ---
+    const STORAGE_KEY = 'qa_scenarios_v1_bigbluesync';
+
+    const SECTIONS = [
+      {
+        id: '0',
+        title: 'Section 0 — Environment Setup & Pre-Flight Matrix',
+        kind: 'plain',
+        groups: [
+          {
+            id: '0.1',
+            title: 'Required Prerequisites & Delta Configuration',
+            cols: ['Component / Tool', 'Required State / Test Configuration', 'Rationale & Importance'],
+            rows: [
+              {
+                id: '0.1.1',
+                a: 'Python Runtime & Dependencies',
+                e: 'Python 3.10+ installed with <code>customtkinter</code> and <code>imageio_ffmpeg</code>.',
+                note: { k: 'info', t: 'Design rationale: imageio_ffmpeg bundles a platform-specific FFmpeg binary, eliminating manual PATH configuration.' }
+              },
+              {
+                id: '0.1.2',
+                a: 'Network Access & SSL Handshake',
+                e: 'Accessible Internet connection capable of reaching sample BigBlueButton servers.',
+                note: { k: 'sec', t: 'Security note: The script explicitly utilizes ssl._create_unverified_context() to tolerate institutional self-signed certificates.' }
+              },
+              {
+                id: '0.1.3',
+                a: 'Clean Slate Reset Command',
+                e: 'Remove test output files: <code>Remove-Item "$HOME\\Downloads\\BigBlueSync_*" -Force -ErrorAction SilentlyContinue</code> in PowerShell.',
+                note: { k: 'info', t: 'Ensures verification starts with no pre-existing merged artifacts.' }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: '1',
+        title: 'Section 1 — URL Parsing & Meeting ID Extraction',
+        groups: [
+          {
+            id: '1.1',
+            title: 'Input Validation & Boundary URL Handling',
+            cols: ['Action / Input', 'Judgeable Expectation'],
+            rows: [
+              {
+                id: '1.1.1',
+                a: 'Leave URL field empty, click <b>Start Download & Sync</b>',
+                e: 'Status label shows red error: <code>Error: Please enter a valid BigBlueButton URL.</code>. Progress bar stays 0%. No background network thread is spawned.',
+                note: { k: 'info', t: 'Design rationale: Client-side guard prevents sending malformed requests.' }
+              },
+              {
+                id: '1.1.2',
+                a: 'Enter whitespace only (<code>"   "</code>) in URL field and click start',
+                e: 'Status label shows red error: <code>Error: Please enter a valid BigBlueButton URL.</code>. Leading and trailing spaces are trimmed cleanly.',
+              },
+              {
+                id: '1.1.3',
+                a: 'Enter arbitrary non-URL text (e.g. <code>random_gibberish_string</code>)',
+                e: 'Status updates to red error: <code>Error: Could not extract Meeting ID from URL.</code>. Action button re-enables as <code>Start Download & Sync</code>.'
+              },
+              {
+                id: '1.1.4',
+                a: 'Enter standard BigBlueButton 2.3 path URL: <code>https://bbb.uni.edu/playback/presentation/2.3/d3b07384d113edec49eaa6238ad5ff00</code>',
+                e: 'Extracts <code>meeting_id = d3b07384d113edec49eaa6238ad5ff00</code>. Status advances to <code>Analyzing URL & session...</code>.'
+              },
+              {
+                id: '1.1.5',
+                a: 'Enter URL with query parameter format: <code>https://bbb.uni.edu/playback.html?meetingId=a1b2c3d4e5f678901234567890abcdef12345678</code>',
+                e: 'Correctly extracts query meetingId parameter <code>a1b2c3d4e5f678901234567890abcdef12345678</code> without query artifacts.'
+              },
+              {
+                id: '1.1.6',
+                a: 'Enter URL with trailing slash: <code>https://bbb.uni.edu/playback/presentation/2.3/99a8b7c6d5e4/</code>',
+                e: 'Path trailing slash is stripped cleanly; extracts <code>99a8b7c6d5e4</code> without raising IndexErrors.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: '2',
+        title: 'Section 2 — Destination Directory & File Browser',
+        groups: [
+          {
+            id: '2.1',
+            title: 'Directory Selection & Creation Guards',
+            cols: ['Action / Input', 'Judgeable Expectation'],
+            rows: [
+              {
+                id: '2.1.1',
+                a: 'Launch application and inspect default Save Destination path',
+                e: 'Entry pre-populates with standard user Downloads directory: <code>C:\\Users\\<User>\\Downloads</code>.'
+              },
+              {
+                id: '2.1.2',
+                a: 'Click <b>Browse</b> button, select a new directory, click <b>Select Folder</b>',
+                e: 'Save destination entry is cleared and updated with the exact chosen directory path.'
+              },
+              {
+                id: '2.1.3',
+                a: 'Click <b>Browse</b> button, then click <b>Cancel</b>',
+                e: 'Existing path in the entry remains untouched; no change or blanking occurs.'
+              },
+              {
+                id: '2.1.4',
+                a: 'Enter a non-existent sub-folder path manually (e.g. <code>Downloads\\BigBlueSync_TestDir</code>)',
+                e: '<code>os.makedirs(output_dir, exist_ok=True)</code> creates the full directory tree automatically without raising errors.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: '3',
+        title: 'Section 3 — Stream Acquisition & Download Ingestion',
+        groups: [
+          {
+            id: '3.1',
+            title: 'Network Ingestion, Chunking & Progress Feedback',
+            cols: ['Action / Input', 'Judgeable Expectation'],
+            rows: [
+              {
+                id: '3.1.1',
+                a: 'Initiate download on valid BBB lecture link',
+                e: 'Status progresses in order: <code>Analyzing URL & session...</code> → <code>Connecting to Webcam & Audio stream...</code> → live MB progress → <code>Connecting to Deskshare / Screen stream...</code>.'
+              },
+              {
+                id: '3.1.2',
+                a: 'Verify chunked buffer read size during download',
+                e: 'Data streams in 16384-byte chunks; UI updates progress bar every 50 chunks without freezing the window.'
+              },
+              {
+                id: '3.1.3',
+                a: 'Verify live MB progress calculation when Content-Length header is present',
+                e: 'Status displays exact format: <code>Downloading <label>: X.X / Y.Y MB (Z.Z%)</code> and progress bar fills proportionally between 0.0 and 1.0.'
+              },
+              {
+                id: '3.1.4',
+                a: 'Verify fallback behavior when Content-Length header is missing or -1',
+                e: 'Status displays format: <code>Downloading <label>: X.X MB</code> without division by zero or NaN crash.'
+              },
+              {
+                id: '3.1.5',
+                a: 'Provide URL where target video streams return HTTP 404 (non-existent recording)',
+                e: 'Status updates in red: <code>Error: No downloadable streams found on the server.</code>. No 0-byte ghost files remain.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: '4',
+        title: 'Section 4 — Lossless FFmpeg Multiplexing & Merging',
+        groups: [
+          {
+            id: '4.1',
+            title: 'Remuxing Logic & Process Execution',
+            cols: ['Action / Input', 'Judgeable Expectation'],
+            rows: [
+              {
+                id: '4.1.1',
+                a: 'Run download with <b>Auto-Merge Screen Video + Webcam Audio</b> toggle ENABLED',
+                e: 'Upon stream completion, status displays: <code>Merging screen video & webcam audio...</code>. FFmpeg executes <code>-map 0:v:0 -map 1:a:0 -c:v copy -c:a copy -shortest</code>.',
+                note: { k: 'info', t: 'Design rationale: Stream copy takes ~2 seconds and performs 100% lossless remuxing without CPU-heavy transcoding.' }
+              },
+              {
+                id: '4.1.2',
+                a: 'Verify output file naming in destination folder',
+                e: 'Output file is created with prefix: <code>BigBlueSync_<first10charsOfID>_MERGED.mp4</code>. Target directory contains the clean merged file.'
+              },
+              {
+                id: '4.1.3',
+                a: 'Verify Windows subprocess creation flags',
+                e: 'On Windows (<code>os.name == "nt"</code>), flag <code>0x08000000</code> (CREATE_NO_WINDOW) is passed so no black console window pops up during merge.'
+              },
+              {
+                id: '4.1.4',
+                a: 'Run download with <b>Auto-Merge</b> toggle DISABLED',
+                e: 'Remux step is bypassed; raw <code>BigBlueSync_<id>_webcams.mp4</code> and <code>BigBlueSync_<id>_deskshare.mp4</code> remain intact. Status shows: <code>Saved individual stream file(s) successfully.</code>.'
+              },
+              {
+                id: '4.1.5',
+                a: 'Simulate single-stream lecture (e.g. webcam exists but no screen share was used)',
+                e: 'Merge is safely skipped; existing raw file is preserved, status reports: <code>Saved individual stream file(s) successfully.</code>.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: '5',
+        title: 'Section 5 — Concurrency, State Guarding & Thread Safety',
+        groups: [
+          {
+            id: '5.1',
+            title: 'Button State & Thread Lifecycle',
+            cols: ['Action / Input', 'Judgeable Expectation'],
+            rows: [
+              {
+                id: '5.1.1',
+                a: 'Click <b>Start Download & Sync</b> and rapidly click button multiple times',
+                e: 'Button immediately changes state to <code>disabled</code>, background color shifts to muted slate, and text becomes <code>DOWNLOADING...</code>. Only 1 background thread is created.',
+                note: { k: 'info', t: 'Guards against race conditions, duplicate bandwidth consumption, and corrupted disk writes.' }
+              },
+              {
+                id: '5.1.2',
+                a: 'Observe GUI responsiveness during large 500MB download',
+                e: 'Window can be dragged, minimized, and restored smoothly with 0 stutter or "Not Responding" titlebar warnings.'
+              },
+              {
+                id: '5.1.3',
+                a: 'Verify button reset upon task completion or network failure',
+                e: '<code>finally</code> block triggers <code>reset_button()</code>; button returns to <code>state="normal"</code>, background color <code>#0284C7</code>, and text <code>Start Download & Sync</code>.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: '6',
+        title: 'Section 6 — End-to-End User Journeys',
+        groups: [
+          {
+            id: '6.1',
+            title: 'Complete Lifecycle Runs',
+            cols: ['Action / Input', 'Judgeable Expectation'],
+            rows: [
+              {
+                id: '6.1.1',
+                a: 'Full Success Flow: Enter live BBB URL → Choose custom folder → Enable merge → Click Download',
+                e: 'Progress bar reaches 100%, status text displays green message: <code>Complete! Lecture Downloaded & Merged Successfully.</code>. Merged .mp4 plays in VLC with synced screen video and speaker audio.'
+              },
+              {
+                id: '6.1.2',
+                a: 'Invalid Session Flow: Enter invalid URL → Trigger Download',
+                e: 'Status updates to red error message within 2 seconds. Button restores to normal state. No crash occurs.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: '7',
+        title: 'Section 7 — Summary: An Error MUST Appear',
+        kind: 'plain',
+        groups: [
+          {
+            id: '7.1',
+            title: 'Mandatory Negative Assertions (Absence of error is a bug)',
+            cols: ['Trigger / Condition', 'Required Error Message & UI Behavior'],
+            rows: [
+              {
+                id: '7.1.1',
+                a: 'Empty or whitespace-only URL submitted',
+                e: 'Must show red status: <code>Error: Please enter a valid BigBlueButton URL.</code>. Progress bar must stay 0%.'
+              },
+              {
+                id: '7.1.2',
+                a: 'Unextractable or random text URL provided',
+                e: 'Must show red status: <code>Error: Could not extract Meeting ID from URL.</code>.'
+              },
+              {
+                id: '7.1.3',
+                a: 'Server returns 404 / 403 on both webcam and deskshare streams',
+                e: 'Must show red status: <code>Error: No downloadable streams found on the server.</code>.'
+              },
+              {
+                id: '7.1.4',
+                a: 'FFmpeg process fails during stream multiplexing',
+                e: 'Must catch <code>subprocess.CalledProcessError</code> and show red status: <code>Merge Failed: <errorDetail></code>.'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: '8',
+        title: 'Section 8 — Summary: No Error MAY Appear',
+        kind: 'plain',
+        groups: [
+          {
+            id: '8.1',
+            title: 'Mandatory Positive Assertions (Any error or alert is a bug)',
+            cols: ['Normal Workflow Condition', 'Required Clean Behavior'],
+            rows: [
+              {
+                id: '8.1.1',
+                a: 'Accessing BBB server with self-signed SSL certificate',
+                e: 'Must NOT raise <code>ssl.SSLCertVerificationError</code> or popup security dialogs.'
+              },
+              {
+                id: '8.1.2',
+                a: 'Downloading lecture where Content-Length header is omitted by server',
+                e: 'Must NOT crash with ZeroDivisionError; streams chunks smoothly and reports total downloaded MB.'
+              },
+              {
+                id: '8.1.3',
+                a: 'Selecting destination folder and clicking Cancel in folder dialog',
+                e: 'Must NOT raise error, clear existing path, or throw TypeError.'
+              },
+              {
+                id: '8.1.4',
+                a: 'Executing FFmpeg remux on Windows NT platform',
+                e: 'Must NOT pop up external command prompt windows or flash taskbar icons.'
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // --- RUNTIME CONTROLLER ---
+    let state = {};
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        state = saved ? JSON.parse(saved) : {};
+      } catch (e) {
+        state = {};
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error('Failed to save state:', e);
+      }
+      updateStats();
+    }
+
+    function sanitize(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      let sanitized = div.innerHTML;
+      return sanitized
+        .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>')
+        .replace(/&lt;code&gt;/g, '<code>').replace(/&lt;\/code&gt;/g, '</code>')
+        .replace(/&lt;kbd&gt;/g, '<kbd>').replace(/&lt;\/kbd&gt;/g, '</kbd>')
+        .replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>');
+    }
+
+    function updateStats() {
+      let total = 0, pass = 0, fail = 0, na = 0;
+      
+      SECTIONS.forEach(sec => {
+        if (sec.kind === 'plain') return;
+        sec.groups.forEach(grp => {
+          grp.rows.forEach(row => {
+            total++;
+            const s = state[row.id];
+            if (s === 'pass') pass++;
+            else if (s === 'fail') fail++;
+            else if (s === 'na') na++;
+          });
+        });
+      });
+
+      const remain = total - (pass + fail + na);
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statPass').textContent = pass;
+      document.getElementById('statFail').textContent = fail;
+      document.getElementById('statNA').textContent = na;
+      document.getElementById('statRemain').textContent = remain;
+
+      const pPct = total ? (pass / total) * 100 : 0;
+      const fPct = total ? (fail / total) * 100 : 0;
+      const nPct = total ? (na / total) * 100 : 0;
+
+      document.getElementById('progPass').style.width = pPct + '%';
+      document.getElementById('progFail').style.width = fPct + '%';
+      document.getElementById('progNA').style.width = nPct + '%';
+
+      // Update Section headers
+      SECTIONS.forEach(sec => {
+        if (sec.kind === 'plain') return;
+        let sTotal = 0, sDone = 0, sPass = 0;
+        sec.groups.forEach(grp => {
+          grp.rows.forEach(row => {
+            sTotal++;
+            if (state[row.id]) sDone++;
+            if (state[row.id] === 'pass') sPass++;
+          });
+        });
+        const cntEl = document.getElementById(`sec-cnt-${sec.id}`);
+        const barEl = document.getElementById(`sec-prog-${sec.id}`);
+        if (cntEl) cntEl.textContent = `${sDone}/${sTotal} done`;
+        if (barEl) {
+          barEl.innerHTML = `<div style="background-color: var(--status-pass); width: ${sTotal ? (sPass/sTotal)*100 : 0}%; height: 100%;"></div>`;
+        }
+      });
+    }
+
+    function renderTOC() {
+      const toc = document.getElementById('tocNav');
+      toc.innerHTML = '';
+      SECTIONS.forEach(sec => {
+        const a = document.createElement('a');
+        a.href = `#sec-${sec.id}`;
+        a.className = 'toc-link';
+        a.textContent = sec.title;
+        toc.appendChild(a);
+      });
+    }
+
+    function renderSections() {
+      const container = document.getElementById('sectionsContainer');
+      container.innerHTML = '';
+
+      SECTIONS.forEach(sec => {
+        const card = document.createElement('div');
+        card.className = 'section-card';
+        card.id = `sec-${sec.id}`;
+
+        let totalRows = 0;
+        sec.groups.forEach(g => totalRows += g.rows.length);
+
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        header.innerHTML = `
+          <div class="section-title">
+            <span>${sanitize(sec.title)}</span>
+          </div>
+          <div class="section-meta">
+            ${sec.kind !== 'plain' ? `
+              <div id="sec-prog-${sec.id}" class="section-progress"></div>
+              <span id="sec-cnt-${sec.id}">0/${totalRows} done</span>
+            ` : '<span style="color: var(--accent-light);">Reference Matrix</span>'}
+            <span class="toggle-icon">▼</span>
+          </div>
+        `;
+
+        header.addEventListener('click', () => {
+          card.classList.toggle('collapsed');
+          const icon = header.querySelector('.toggle-icon');
+          icon.textContent = card.classList.contains('collapsed') ? '▶' : '▼';
+        });
+
+        const body = document.createElement('div');
+        body.className = 'section-body';
+
+        sec.groups.forEach(grp => {
+          const grpTitle = document.createElement('div');
+          grpTitle.className = 'group-title';
+          grpTitle.textContent = grp.title;
+          body.appendChild(grpTitle);
+
+          const table = document.createElement('table');
+          table.className = 'test-table';
+          table.innerHTML = `
+            <thead>
+              <tr>
+                <th style="width: 10%;">ID</th>
+                <th class="action-col">${sanitize(grp.cols[0])}</th>
+                <th class="expect-col">${sanitize(grp.cols[1])}</th>
+                ${sec.kind !== 'plain' ? '<th class="status-col">Verdict</th>' : ''}
+              </tr>
+            </thead>
+            <tbody></tbody>
+          `;
+
+          const tbody = table.querySelector('tbody');
+
+          grp.rows.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.className = `test-row ${state[row.id] ? 'status-' + state[row.id] : ''}`;
+            tr.id = `row-${row.id}`;
+            tr.dataset.id = row.id;
+            tr.dataset.text = `${row.id} ${row.a} ${row.e} ${row.note ? row.note.t : ''}`.toLowerCase();
+
+            let noteHtml = '';
+            if (row.note) {
+              noteHtml = `
+                <div class="test-note ${row.note.k}">
+                  <span>${row.note.k === 'sec' ? '🔒' : row.note.k === 'warn' ? '⚠️' : 'ℹ️'}</span>
+                  <div>${sanitize(row.note.t)}</div>
+                </div>
+              `;
+            }
+
+            tr.innerHTML = `
+              <td class="test-id">${row.id}</td>
+              <td class="action-col">${sanitize(row.a)}</td>
+              <td class="expect-col">${sanitize(row.e)}${noteHtml}</td>
+              ${sec.kind !== 'plain' ? `
+                <td class="status-col">
+                  <div class="status-btn-group">
+                    <button class="status-btn btn-pass ${state[row.id] === 'pass' ? 'active' : ''}" onclick="setStatus('${row.id}', 'pass')">✓ Pass</button>
+                    <button class="status-btn btn-fail ${state[row.id] === 'fail' ? 'active' : ''}" onclick="setStatus('${row.id}', 'fail')">✕ Fail</button>
+                    <button class="status-btn btn-na ${state[row.id] === 'na' ? 'active' : ''}" onclick="setStatus('${row.id}', 'na')">– N/A</button>
+                  </div>
+                </td>
+              ` : ''}
+            `;
+
+            tbody.appendChild(tr);
+          });
+
+          body.appendChild(table);
+        });
+
+        card.appendChild(header);
+        card.appendChild(body);
+        container.appendChild(card);
+      });
+
+      applyFilters();
+      updateStats();
+    }
+
+    window.setStatus = function(id, val) {
+      if (state[id] === val) {
+        delete state[id];
+      } else {
+        state[id] = val;
+      }
+      saveState();
+
+      const row = document.getElementById(`row-${id}`);
+      if (row) {
+        row.className = `test-row ${state[id] ? 'status-' + state[id] : ''}`;
+        const btns = row.querySelectorAll('.status-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        if (state[id]) {
+          const activeBtn = row.querySelector(`.btn-${state[id]}`);
+          if (activeBtn) activeBtn.classList.add('active');
+        }
+      }
+      applyFilters();
+    };
+
+    function applyFilters() {
+      const rows = document.querySelectorAll('.test-row');
+      rows.forEach(row => {
+        const id = row.dataset.id;
+        const text = row.dataset.text || '';
+        const st = state[id];
+
+        let matchesSearch = !searchQuery || text.includes(searchQuery);
+        let matchesFilter = true;
+
+        if (activeFilter === 'remain') matchesFilter = !st;
+        else if (activeFilter === 'pass') matchesFilter = st === 'pass';
+        else if (activeFilter === 'fail') matchesFilter = st === 'fail';
+
+        if (matchesSearch && matchesFilter) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // Event Listeners
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      applyFilters();
+    });
+
+    document.querySelectorAll('.pill-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+      });
+    });
+
+    document.getElementById('toggleExpandBtn').addEventListener('click', function() {
+      const cards = document.querySelectorAll('.section-card');
+      const isCollapse = this.textContent === 'Collapse All';
+      cards.forEach(c => {
+        if (isCollapse) {
+          c.classList.add('collapsed');
+          c.querySelector('.toggle-icon').textContent = '▶';
+        } else {
+          c.classList.remove('collapsed');
+          c.querySelector('.toggle-icon').textContent = '▼';
+        }
+      });
+      this.textContent = isCollapse ? 'Expand All' : 'Collapse All';
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to reset all test verification progress?')) {
+        state = {};
+        saveState();
+        renderSections();
+      }
+    });
+
+    // Initialize
+    loadState();
+    renderTOC();
+    renderSections();
+  </script>
+</body>
+</html>
