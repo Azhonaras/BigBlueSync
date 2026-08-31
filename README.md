@@ -39,27 +39,39 @@ Precompiled standalone binaries are available on the [Releases](https://github.c
 
 ---
 
-## Processing pipeline
+## System architecture
 
-```
-                         BigBlueButton Playback URL
-                                     │
-                    Meeting ID & Server Host Extraction
-                                     │
-                ┌────────────────────┴────────────────────┐
-                ▼                                         ▼
-         webcams.mp4                              deskshare.mp4
-   (Presenter Voice & Video)                  (Screen Share & Slides)
-                │                                         │
-                └────────────────────┬────────────────────┘
-                                     ▼
-                          FFmpeg Zero-Copy Remux
-                       -map 0:v:0 (deskshare video)
-                       -map 1:a:0 (webcam audio)
-                       -c:v copy -c:a copy
-                                     │
-                                     ▼
-                       BigBlueSync_<id>_MERGED.mp4
+```mermaid
+flowchart TD
+    subgraph Client["Desktop Interface (CustomTkinter)"]
+        A["Playback URL Input"]
+        P["Live Progress & Status Bar"]
+    end
+
+    subgraph Engine["BigBlueSync Core"]
+        B["URL Resolver\n(Meeting ID Regex & Host Parser)"]
+        C["Threaded Stream Downloader\n(SSL Context & 16 KB Buffer)"]
+    end
+
+    subgraph Server["BigBlueButton Server"]
+        D["webcams.mp4\n(Audio & Camera Stream)"]
+        E["deskshare.mp4\n(Screen Share & Slides)"]
+    end
+
+    subgraph Multiplexer["FFmpeg Remux Engine"]
+        F["Lossless Stream Multiplexer\n-map 0:v:0 -map 1:a:0\n-c:v copy -c:a copy -shortest"]
+    end
+
+    subgraph Storage["Output File"]
+        G["BigBlueSync_<id>_MERGED.mp4\n(Synchronized Video & Audio)"]
+    end
+
+    A --> B
+    B -->|Resolve Stream URLs| Server
+    D & E -->|HTTP Stream Ingestion| C
+    C -->|Thread-safe Progress Dispatches| P
+    C -->|Download Staging| F
+    F -->|Zero-Copy Multiplexing| G
 ```
 
 ---
