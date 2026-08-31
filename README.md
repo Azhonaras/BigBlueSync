@@ -42,36 +42,41 @@ Precompiled standalone binaries are available on the [Releases](https://github.c
 ## System architecture
 
 ```mermaid
-flowchart TD
-    subgraph Client["Desktop Interface (CustomTkinter)"]
-        A["Playback URL Input"]
-        P["Live Progress & Status Bar"]
+flowchart LR
+    subgraph S1["1. Client Input"]
+        direction TB
+        A["Playback URL"]
+        UI["CustomTkinter UI\n(Progress & MB rate)"]
     end
 
-    subgraph Engine["BigBlueSync Core"]
-        B["URL Resolver\n(Meeting ID Regex & Host Parser)"]
-        C["Threaded Stream Downloader\n(SSL Context & 16 KB Buffer)"]
+    subgraph S2["2. Core Engine"]
+        direction TB
+        B["URL Parser\n(Meeting ID Regex)"]
+        C["Stream Downloader\n(SSL & 16 KB Buffer)"]
     end
 
-    subgraph Server["BigBlueButton Server"]
-        D["webcams.mp4\n(Audio & Camera Stream)"]
-        E["deskshare.mp4\n(Screen Share & Slides)"]
+    subgraph S3["3. BBB Server"]
+        direction TB
+        D["webcams.mp4\n(Audio + Camera)"]
+        E["deskshare.mp4\n(Screen + Slides)"]
     end
 
-    subgraph Multiplexer["FFmpeg Remux Engine"]
-        F["Lossless Stream Multiplexer\n-map 0:v:0 -map 1:a:0\n-c:v copy -c:a copy -shortest"]
+    subgraph S4["4. Remux Engine"]
+        direction TB
+        F["FFmpeg Multiplexer\n-map 0:v:0 -map 1:a:0\n-c:v copy -c:a copy"]
     end
 
-    subgraph Storage["Output File"]
-        G["BigBlueSync_<id>_MERGED.mp4\n(Synchronized Video & Audio)"]
+    subgraph S5["5. Local Storage"]
+        direction TB
+        G["BigBlueSync_<id>_MERGED.mp4\n(Synchronized Output)"]
     end
 
     A --> B
-    B -->|Resolve Stream URLs| Server
-    D & E -->|HTTP Stream Ingestion| C
-    C -->|Thread-safe Progress Dispatches| P
-    C -->|Download Staging| F
-    F -->|Zero-Copy Multiplexing| G
+    B -->|Query endpoints| S3
+    D & E -->|Chunked streams| C
+    C -.->|Progress events| UI
+    C -->|Raw streams| F
+    F -->|Lossless output| G
 ```
 
 ---
