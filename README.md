@@ -18,7 +18,7 @@ BigBlueButton stores recordings in separate media streams, typically keeping scr
 
 ## Download and run
 
-Precompiled standalone binaries are available on the [Releases](https://github.com/yourusername/BigBlueSync/releases) page. No Python or dependencies required.
+Precompiled standalone binaries are available on the [Releases](https://github.com/Azhonaras/BigBlueSync/releases) page. No Python or dependencies required.
 
 | Platform | File to download | How to run |
 | :--- | :--- | :--- |
@@ -69,7 +69,7 @@ Precompiled standalone binaries are available on the [Releases](https://github.c
 If you prefer to run from source code:
 
 ```bash
-git clone https://github.com/yourusername/BigBlueSync.git
+git clone https://github.com/Azhonaras/BigBlueSync.git
 cd BigBlueSync
 pip install -r requirements.txt
 python BigBlueSync.py
